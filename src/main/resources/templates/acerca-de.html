@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acerca del Desarrollador</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --pastel-blue: #a8d8ea;
+            --pastel-green: #b8e0d2;
+            --pastel-pink: #ffd6e7;
+            --pastel-purple: #d9c5f4;
+            --pastel-yellow: #fff9c4;
+            --pastel-lavender: #e6e6fa;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--pastel-lavender), var(--pastel-blue));
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding-top: 76px;
+        }
+        
+        .navbar-pastel {
+            background-color: var(--pastel-blue) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-link {
+            color: #5a5a5a !important;
+            font-weight: 500;
+            padding: 8px 15px !important;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background-color: var(--pastel-purple) !important;
+            color: #333 !important;
+        }
+        
+        .nav-link.active {
+            background-color: var(--pastel-pink) !important;
+            color: #333 !important;
+        }
+        
+        .card-profile {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, var(--pastel-blue), var(--pastel-purple));
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: white;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: var(--pastel-purple);
+            border: 5px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .info-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .info-item:hover {
+            background-color: rgba(168, 216, 234, 0.1);
+            padding-left: 25px;
+        }
+        
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--pastel-pink);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: #333;
+        }
+        
+        .skill-badge {
+            background-color: var(--pastel-green);
+            color: #333;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        
+        .skill-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        
+        .btn-pastel-primary {
+            background-color: var(--pastel-pink);
+            border: none;
+            color: #333;
+            padding: 10px 25px;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+        
+        .btn-pastel-primary:hover {
+            background-color: var(--pastel-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de Navegación Superior -->
+    <nav class="navbar navbar-expand-lg navbar-pastel fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-house-heart"></i> Sistema Simple
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/principal">
+                            <i class="bi bi-people"></i> Personas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/registrar">
+                            <i class="bi bi-person-plus"></i> Registrar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/acerca">
+                            <i class="bi bi-info-circle"></i> Acerca de
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card-profile">
+                    <!-- Encabezado del Perfil -->
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <h2 th:text="${desarrollador.nombre}">Tu Nombre</h2>
+                        <p class="lead mb-0" th:text="${desarrollador.profesion}">Desarrollador Full Stack</p>
+                    </div>
+                    
+                    <!-- Información Personal -->
+                    <div class="card-body p-4">
+                        <h4 class="mb-4 text-center" style="color: var(--pastel-purple);">
+                            <i class="bi bi-person-badge"></i> Información Personal
+                        </h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <div class="d-flex align-items-center">
+                                        <div class="info-icon">
+                                            <i class="bi bi-envelope"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Email:</strong><br>
+                                            <span th:text="${desarrollador.email}">tu.email@ejemplo.com</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="d-flex align-items-center">
+                                        <div class="info-icon">
+                                            <i class="bi bi-calendar"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Edad:</strong><br>
+                                            <span th:text="${desarrollador.edad} + ' años'">25 años</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <div class="d-flex align-items-center">
+                                        <div class="info-icon">
+                                            <i class="bi bi-telephone"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Teléfono:</strong><br>
+                                            <span th:text="${desarrollador.telefono}">1234567890</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="d-flex align-items-center">
+                                        <div class="info-icon">
+                                            <i class="bi bi-github"></i>
+                                        </div>
+                                        <div>
+                                            <strong>GitHub:</strong><br>
+                                            <a th:href="${desarrollador.github}" target="_blank" th:text="${desarrollador.github}">
+                                                https://github.com/tuusuario
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Habilidades -->
+                        <div class="mt-5">
+                            <h4 class="mb-4 text-center" style="color: var(--pastel-purple);">
+                                <i class="bi bi-tools"></i> Habilidades Técnicas
+                            </h4>
+                            <div class="text-center">
+                                <span th:each="habilidad : ${#strings.arraySplit(desarrollador.habilidades, ',')}" 
+                                      class="skill-badge" th:text="${habilidad.trim()}">
+                                    Spring Boot
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Descripción del Proyecto -->
+                        <div class="mt-5">
+                            <h4 class="mb-4 text-center" style="color: var(--pastel-purple);">
+                                <i class="bi bi-code-slash"></i> Acerca de este Proyecto
+                            </h4>
+                            <div class="alert alert-light" style="border-left: 5px solid var(--pastel-green);">
+                                <i class="bi bi-lightbulb" style="color: var(--pastel-green);"></i>
+                                <span th:text="${desarrollador.descripcionProyecto}">
+                                    Aplicación web con Spring Boot MVC y H2 Database
+                                </span>
+                            </div>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-4 mb-3">
+                                    <div class="text-center p-3 rounded" style="background-color: var(--pastel-yellow);">
+                                        <i class="bi bi-bootstrap-fill display-6 mb-3"></i>
+                                        <h5>Frontend</h5>
+                                        <p class="small mb-0">HTML5, CSS3, Bootstrap 5, Thymeleaf</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="text-center p-3 rounded" style="background-color: var(--pastel-blue);">
+                                        <i class="bi bi-filetype-java display-6 mb-3"></i>
+                                        <h5>Backend</h5>
+                                        <p class="small mb-0">Spring Boot, Java, MVC Pattern</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="text-center p-3 rounded" style="background-color: var(--pastel-green);">
+                                        <i class="bi bi-database display-6 mb-3"></i>
+                                        <h5>Base de Datos</h5>
+                                        <p class="small mb-0">H2 Database (en memoria)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botones de Acción -->
+                        <div class="text-center mt-5">
+                            <a href="/" class="btn btn-pastel-primary me-2">
+                                <i class="bi bi-house"></i> Volver al Inicio
+                            </a>
+                            <a href="/principal" class="btn btn-outline-secondary">
+                                <i class="bi bi-table"></i> Ver Tabla de Personas
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer de la Tarjeta -->
+                    <div class="card-footer text-center text-muted py-3">
+                        <small>
+                            <i class="bi bi-c-circle"></i> 
+                            <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}"></span> 
+                            Sistema Simple - Todos los derechos reservados
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- Información Técnica -->
+                <div class="mt-4 text-center">
+                    <div class="alert alert-light" role="alert">
+                        <i class="bi bi-terminal"></i>
+                        <strong>Información técnica:</strong> 
+                        Este proyecto utiliza Spring Boot 
+                        <span class="badge bg-info">v2.7.0+</span> 
+                        y H2 Database 
+                        <span class="badge bg-info">v2.1.214+</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Marcar enlace activo en la navegación
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUrl = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentUrl) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

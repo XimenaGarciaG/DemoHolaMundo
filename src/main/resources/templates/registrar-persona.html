@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Persona</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --pastel-blue: #a8d8ea;
+            --pastel-green: #b8e0d2;
+            --pastel-pink: #ffd6e7;
+            --pastel-purple: #d9c5f4;
+            --pastel-yellow: #fff9c4;
+            --pastel-lavender: #e6e6fa;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--pastel-lavender), var(--pastel-blue));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 100px 0 20px 0; /* Ajuste para la barra de navegación */
+        }
+        
+        .navbar-pastel {
+            background-color: var(--pastel-blue) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .nav-link {
+            color: #5a5a5a !important;
+            font-weight: 500;
+            padding: 8px 15px !important;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background-color: var(--pastel-purple) !important;
+            color: #333 !important;
+        }
+        
+        .nav-link.active {
+            background-color: var(--pastel-pink) !important;
+            color: #333 !important;
+        }
+        
+        .card {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .card-header {
+            border-radius: 20px 20px 0 0 !important;
+            background: linear-gradient(135deg, var(--pastel-blue), var(--pastel-purple));
+        }
+        
+        .btn-pastel-primary {
+            background-color: var(--pastel-pink);
+            border: none;
+            color: #333;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-pastel-primary:hover {
+            background-color: var(--pastel-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .btn-pastel-secondary {
+            background-color: var(--pastel-blue);
+            border: none;
+            color: #333;
+            padding: 12px 30px;
+            border-radius: 25px;
+        }
+        
+        /* Estilos para validación */
+        .form-control:valid {
+            border-color: var(--pastel-green);
+        }
+        
+        .form-control:invalid {
+            border-color: #ff6b6b;
+        }
+        
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+        }
+        
+        /* ReCAPTCHA Personalizado */
+        .recaptcha-container {
+            background: #f9f9f9;
+            border: 2px solid var(--pastel-blue);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            transition: all 0.3s;
+        }
+        
+        .recaptcha-container.verified {
+            border-color: var(--pastel-purple);
+            background: rgba(217, 197, 244, 0.2);
+        }
+        
+        .recaptcha-checkbox {
+            display: none;
+        }
+        
+        .recaptcha-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .recaptcha-box {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--pastel-blue);
+            border-radius: 4px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .recaptcha-checkbox:checked + .recaptcha-label .recaptcha-box {
+            background: var(--pastel-purple);
+            border-color: var(--pastel-purple);
+        }
+        
+        .recaptcha-checkbox:checked + .recaptcha-label .recaptcha-box::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+        }
+        
+        .recaptcha-logo {
+            margin-left: auto;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+        <!-- Barra de Navegación Superior -->
+    <nav class="navbar navbar-expand-lg navbar-pastel fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-home"></i> Sistema Simple
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/principal">
+                            <i class="fas fa-users"></i> Personas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/registrar">
+                            <i class="fas fa-user-plus"></i> Registrar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/acerca">
+                            <i class="fas fa-info-circle"></i> Acerca de
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header text-white text-center py-4">
+                        <h2 class="mb-0">
+                            <i class="fas fa-user-plus"></i> Registrar Nueva Persona
+                        </h2>
+                        <p class="mb-0 mt-2">Formulario con validaciones y seguridad</p>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <!-- Mensaje de Error -->
+                        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mb-4">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span th:text="${error}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        
+                        <!-- Formulario -->
+                        <form th:action="@{/registrar}" method="post" id="registroForm" novalidate>
+                            
+                            <!-- Nombre -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-user"></i> Nombre completo *
+                                </label>
+                                <input type="text" name="nombre" 
+                                       class="form-control"
+                                       placeholder="Ej: Juan Pérez García"
+                                       required
+                                       minlength="2"
+                                       maxlength="100">
+                                <div class="form-text">Mínimo 2 caracteres</div>
+                                <div class="error-message" id="nombreError"></div>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-envelope"></i> Correo electrónico *
+                                </label>
+                                <input type="email" name="email"
+                                       class="form-control"
+                                       placeholder="ejemplo@correo.com"
+                                       required>
+                                <div class="error-message" id="emailError"></div>
+                            </div>
+                            
+                            <!-- Edad -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-birthday-cake"></i> Edad *
+                                    </label>
+                                    <input type="number" name="edad"
+                                           class="form-control"
+                                           placeholder="25"
+                                           min="18"
+                                           max="100"
+                                           required>
+                                    <div class="form-text">18-100 años</div>
+                                    <div class="error-message" id="edadError"></div>
+                                </div>
+                                
+                                <!-- Teléfono -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-phone"></i> Teléfono
+                                    </label>
+                                    <input type="text" name="telefono"
+                                           class="form-control"
+                                           placeholder="10 dígitos (opcional)"
+                                           pattern="\d{10}">
+                                    <div class="form-text">Formato: 10 dígitos</div>
+                                    <div class="error-message" id="telefonoError"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- ReCAPTCHA Dinámico -->
+                            <div class="mb-4">
+                                <h5 class="fw-bold mb-3">
+                                    <i class="fas fa-robot"></i> Verificación de Seguridad
+                                </h5>
+                                
+                                <div class="recaptcha-container" id="recaptchaContainer">
+                                    <input type="checkbox" class="recaptcha-checkbox" 
+                                           id="recaptchaCheckbox" name="recaptchaResponse" value="verified">
+                                    <label for="recaptchaCheckbox" class="recaptcha-label" id="recaptchaLabel">
+                                        <span class="recaptcha-box"></span>
+                                        <span>No soy un robot</span>
+                                        <span class="recaptcha-logo">
+                                            <i class="fas fa-shield-alt"></i>
+                                            reCAPTCHA
+                                            <span class="recaptcha-loader" id="recaptchaLoader" style="display: none;">
+                                                <i class="fas fa-spinner fa-spin ms-2"></i>
+                                            </span>
+                                        </span>
+                                    </label>
+                                    <div class="mt-2 text-muted small">
+                                        <i class="fas fa-info-circle"></i>
+                                        Esta verificación ayuda a prevenir registros automatizados
+                                    </div>
+                                </div>
+                                <div class="error-message" id="recaptchaError"></div>
+                            </div>
+                            
+                            <!-- Botones -->
+                            <div class="d-grid gap-3 d-md-flex justify-content-md-end mt-4">
+                                <a href="/" class="btn btn-outline-secondary px-4 py-2">
+                                    <i class="fas fa-arrow-left"></i> Volver al Inicio
+                                </a>
+                                <button type="submit" class="btn btn-primary px-4 py-2" id="btnRegistrar">
+                                    <i class="fas fa-save"></i> Guardar Registro
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="card-footer text-center text-muted py-3">
+                        <small>
+                            <i class="fas fa-exclamation-circle"></i> Campos marcados con * son obligatorios
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registroForm');
+            const btnRegistrar = document.getElementById('btnRegistrar');
+            const recaptchaCheckbox = document.getElementById('recaptchaCheckbox');
+            const recaptchaContainer = document.getElementById('recaptchaContainer');
+            const recaptchaLoader = document.getElementById('recaptchaLoader');
+            const recaptchaLabel = document.getElementById('recaptchaLabel');
+            
+            // Validación en tiempo real
+            const nombreInput = document.querySelector('input[name="nombre"]');
+            const emailInput = document.querySelector('input[name="email"]');
+            const edadInput = document.querySelector('input[name="edad"]');
+            const telefonoInput = document.querySelector('input[name="telefono"]');
+            
+            // Validar nombre
+            nombreInput.addEventListener('blur', function() {
+                const errorElement = document.getElementById('nombreError');
+                if (this.value.length < 2) {
+                    errorElement.textContent = 'El nombre debe tener al menos 2 caracteres';
+                    this.classList.add('is-invalid');
+                } else {
+                    errorElement.textContent = '';
+                    this.classList.remove('is-invalid');
+                }
+            });
+            
+            // Validar email
+            emailInput.addEventListener('blur', function() {
+                const errorElement = document.getElementById('emailError');
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(this.value)) {
+                    errorElement.textContent = 'Ingresa un email válido';
+                    this.classList.add('is-invalid');
+                } else {
+                    errorElement.textContent = '';
+                    this.classList.remove('is-invalid');
+                }
+            });
+            
+            // Validar edad
+            edadInput.addEventListener('blur', function() {
+                const errorElement = document.getElementById('edadError');
+                const edad = parseInt(this.value);
+                if (isNaN(edad) || edad < 18 || edad > 100) {
+                    errorElement.textContent = 'La edad debe estar entre 18 y 100 años';
+                    this.classList.add('is-invalid');
+                } else {
+                    errorElement.textContent = '';
+                    this.classList.remove('is-invalid');
+                }
+            });
+            
+            // Validar teléfono
+            telefonoInput.addEventListener('blur', function() {
+                const errorElement = document.getElementById('telefonoError');
+                if (this.value && !/^\d{10}$/.test(this.value)) {
+                    errorElement.textContent = 'El teléfono debe tener 10 dígitos';
+                    this.classList.add('is-invalid');
+                } else {
+                    errorElement.textContent = '';
+                    this.classList.remove('is-invalid');
+                }
+            });
+            
+            // ReCAPTCHA Dinámico
+            recaptchaLabel.addEventListener('click', function(e) {
+                if (!recaptchaCheckbox.checked) {
+                    // Mostrar loader
+                    recaptchaLoader.style.display = 'inline-block';
+                    
+                    // Simular verificación con animación
+                    setTimeout(() => {
+                        recaptchaCheckbox.checked = true;
+                        recaptchaContainer.classList.add('verified');
+                        recaptchaLoader.style.display = 'none';
+                        
+                        // Animación de éxito
+                        recaptchaContainer.style.transform = 'scale(1.02)';
+                        setTimeout(() => {
+                            recaptchaContainer.style.transform = 'scale(1)';
+                        }, 300);
+                        
+                        // Cambiar texto
+                        const textSpan = recaptchaLabel.querySelector('span:not(.recaptcha-box):not(.recaptcha-logo)');
+                        textSpan.textContent = 'Verificación completada';
+                        textSpan.style.color = '#4285f4';
+                        textSpan.style.fontWeight = 'bold';
+                    }, 1500);
+                }
+            });
+            
+            // Validación del formulario antes de enviar
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                
+                // Validar nombre
+                if (nombreInput.value.length < 2) {
+                    document.getElementById('nombreError').textContent = 'El nombre es obligatorio';
+                    nombreInput.classList.add('is-invalid');
+                    isValid = false;
+                }
+                
+                // Validar email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(emailInput.value)) {
+                    document.getElementById('emailError').textContent = 'Email inválido';
+                    emailInput.classList.add('is-invalid');
+                    isValid = false;
+                }
+                
+                // Validar edad
+                const edad = parseInt(edadInput.value);
+                if (isNaN(edad) || edad < 18 || edad > 100) {
+                    document.getElementById('edadError').textContent = 'Edad inválida (18-100)';
+                    edadInput.classList.add('is-invalid');
+                    isValid = false;
+                }
+                
+                // Validar reCAPTCHA
+                if (!recaptchaCheckbox.checked) {
+                    document.getElementById('recaptchaError').textContent = 'Debes verificar que no eres un robot';
+                    recaptchaContainer.style.borderColor = '#dc3545';
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    
+                    // Mostrar alerta
+                    alert('Por favor, corrige los errores en el formulario');
+                    
+                    // Scroll al primer error
+                    const firstError = document.querySelector('.is-invalid');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstError.focus();
+                    }
+                } else {
+                    // Deshabilitar botón y mostrar loader
+                    btnRegistrar.disabled = true;
+                    btnRegistrar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+                }
+            });
+            
+            // Auto-ocultar alertas
+            setTimeout(() => {
+                document.querySelectorAll('.alert').forEach(alert => {
+                    alert.style.transition = 'opacity 0.5s';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                });
+            }, 3000);
+            
+            // Limpiar errores al escribir
+            const inputs = form.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.classList.remove('is-invalid');
+                    const errorId = this.name + 'Error';
+                    const errorElement = document.getElementById(errorId);
+                    if (errorElement) {
+                        errorElement.textContent = '';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
