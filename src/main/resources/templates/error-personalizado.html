@@ -110,78 +110,114 @@
 <body>
     <div class="error-container">
         <div class="error-card">
-            <!-- Encabezado del Error -->
+            <!-- Encabezado del Error -->            
             <div class="error-header">
                 <div class="error-icon">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <!-- Icono dinámico según tipo de error -->
+                    <i class="bi" 
+                    th:classappend="${codigoError == 404} ? 'bi-search' : 
+                                        ${codigoError == 400} ? 'bi-exclamation-circle' : 
+                                        ${codigoError == 500} ? 'bi-x-circle' : 
+                                        'bi-exclamation-triangle-fill'">
+                    </i>
                 </div>
-                <h1 class="mb-3">¡Ups! Algo salió mal</h1>
-                <div class="status-code" th:text="${codigoError} ?: 'Error'">
-                    Error
+                <h1 class="mb-3" th:text="${tipoError} ?: '¡Ups! Algo salió mal'">
+                    ¡Ups! Algo salió mal
+                </h1>
+                <div class="status-code">
+                    <span th:text="${codigoError} ?: 'Error'">Error</span>
+                    <small class="d-block" th:text="${tipoError} ?: 'Error desconocido'">
+                        Error desconocido
+                    </small>
                 </div>
             </div>
-            
-            <!-- Cuerpo del Error -->
-            <div class="error-body">
-                <!-- Mensaje Principal -->
-                <div class="text-center mb-4">
-                    <h3 class="text-danger" th:text="${error} ?: 'Ha ocurrido un error inesperado'">
-                        Ha ocurrido un error inesperado
-                    </h3>
-                </div>
-                
-                <!-- Detalles del Error (solo en desarrollo) -->
-                <div th:if="${detalles != null}" class="error-details">
-                    <h5><i class="bi bi-bug"></i> Detalles Técnicos:</h5>
-                    <div class="mt-3">
-                        <strong>Mensaje:</strong>
-                        <div class="alert alert-light mt-2">
-                            <code th:text="${error}">Mensaje de error</code>
-                        </div>
-                        
-                        <strong>Excepción:</strong>
-                        <div class="alert alert-light mt-2">
-                            <code th:text="${detalles}">Detalles de la excepción</code>
-                        </div>
-                        
-                        <strong>URI:</strong>
-                        <div class="alert alert-light mt-2">
-                            <code th:text="${#httpServletRequest.requestURI}">URI solicitada</code>
-                        </div>
-                        
-                        <th:block th:if="${timestamp != null}">
-                            <strong>Fecha y Hora:</strong>
-                            <div class="alert alert-light mt-2">
-                                <code th:text="${timestamp}">Timestamp</code>
+
+            <!-- Reemplaza la sección de DETALLES DEL ERROR con esto: -->
+            <div th:if="${detalles != null}" class="error-details">
+                <h5><i class="bi bi-bug"></i> Información del Error:</h5>
+                <div class="mt-3">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Tipo de Error:</strong>
+                            <div class="alert alert-light mt-1">
+                                <code th:text="${tipoError} ?: 'Desconocido'">Desconocido</code>
                             </div>
-                        </th:block>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Código HTTP:</strong>
+                            <div class="alert alert-light mt-1">
+                                <code th:text="${codigoError} ?: 'N/A'">N/A</code>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Botones de Acción -->
-                <div class="text-center mt-5">
-                    <a href="/" class="btn btn-error me-3">
-                        <i class="bi bi-house"></i> Volver al Inicio
-                    </a>
-                    <button onclick="history.back()" class="btn btn-error-secondary me-3">
-                        <i class="bi bi-arrow-left"></i> Volver Atrás
-                    </button>
-                    <a href="mailto:soporte@sistema.com?subject=Reporte de Error" class="btn btn-error">
-                        <i class="bi bi-envelope"></i> Reportar Error
-                    </a>
-                </div>
-                
-                <!-- Consejos de Solución -->
-                <div class="alert alert-info mt-4">
-                    <h6><i class="bi bi-lightbulb"></i> ¿Qué puedes hacer?</h6>
-                    <ul class="mb-0">
-                        <li>Verifica que la URL sea correcta</li>
-                        <li>Recarga la página</li>
-                        <li>Si el problema persiste, contacta al administrador</li>
-                    </ul>
+                    
+                    <strong>Mensaje:</strong>
+                    <div class="alert alert-light mt-2">
+                        <code th:text="${error} ?: 'No hay mensaje disponible'">
+                            No hay mensaje disponible
+                        </code>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Método HTTP:</strong>
+                            <div class="alert alert-light mt-1">
+                                <code th:text="${metodo} ?: 'N/A'">N/A</code>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>URI:</strong>
+                            <div class="alert alert-light mt-1">
+                                <code th:text="${uri} ?: ${#httpServletRequest.requestURI}">
+                                    URI solicitada
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <strong>Detalles Técnicos:</strong>
+                    <div class="alert alert-dark mt-2">
+                        <pre style="white-space: pre-wrap; word-wrap: break-word; font-size: 0.8rem;"
+                            th:text="${detalles} ?: 'No hay detalles disponibles'">
+                            No hay detalles disponibles
+                        </pre>
+                    </div>
+                    
+                    <th:block th:if="${timestamp != null}">
+                        <strong>Fecha y Hora del Error:</strong>
+                        <div class="alert alert-light mt-2">
+                            <code th:text="${#dates.format(timestamp, 'dd/MM/yyyy HH:mm:ss')}">
+                                Timestamp
+                            </code>
+                        </div>
+                    </th:block>
                 </div>
             </div>
-            
+
+            <!-- Agrega esto DESPUÉS de los botones de acción: -->
+            <div class="alert" 
+                th:classappend="${codigoError == 404} ? 'alert-warning' : 
+                                ${codigoError == 400} ? 'alert-info' : 
+                                ${codigoError >= 500} ? 'alert-danger' : 'alert-secondary'">
+                <h6><i class="bi bi-info-circle"></i> ¿Qué significa este error?</h6>
+                <div th:switch="${codigoError}">
+                    <p th:case="404">
+                        El recurso o página que estás buscando no existe o ha sido eliminado.
+                        Verifica la URL o regresa a la página anterior.
+                    </p>
+                    <p th:case="400">
+                        La solicitud contiene parámetros inválidos o mal formados.
+                        Verifica los datos ingresados.
+                    </p>
+                    <p th:case="500">
+                        Ocurrió un error interno en el servidor. Esto no es tu culpa.
+                        El administrador ha sido notificado.
+                    </p>
+                    <p th:case="*">
+                        Ha ocurrido un error inesperado en el sistema.
+                    </p>
+                </div>
+            </div>
             <!-- Pie de Página -->
             <div class="error-footer">
                 <div class="row">
