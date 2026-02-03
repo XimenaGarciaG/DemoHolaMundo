@@ -1,13 +1,18 @@
 services:
   - type: web
-    name: springboot-demo
-    runtime: docker
+    name: demo-springboot
+    env: maven
     plan: free
+    region: ohio
     branch: main
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/*.jar --server.port=$PORT
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
+      - key: PORT
+        value: 8080
       - key: JAVA_OPTS
-        value: -Xmx512m
-    healthCheckPath: /actuator/health
+        value: -Xmx300m -Xss512k -XX:MaxMetaspaceSize=150m
+    healthCheckPath: /
     autoDeploy: true
