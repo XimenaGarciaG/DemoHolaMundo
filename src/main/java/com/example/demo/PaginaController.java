@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import com.example.demo.exceptions.ResourceNotFoundException;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -230,27 +233,58 @@ public class PaginaController {
         throw new DataAccessException("Error de conexión a base de datos") {};
     }
 
-    // ===== EXCEPCIÓN PERSONALIZADA =====
-    public class ResourceNotFoundException extends RuntimeException {
-        public ResourceNotFoundException(String message) {
-            super(message);
-        }
+    @GetMapping("/ver-error")
+    public String verErrorDirecto(Model model, HttpServletRequest request) {
+        // Pasar datos directamente a la plantilla (sin excepción)
+        model.addAttribute("codigoError", 404);
+        model.addAttribute("tipoError", "Página No Encontrada");
+        model.addAttribute("error", "La página que buscas no existe o ha sido movida.");
+        model.addAttribute("detalles", "Endpoint de prueba - Recurso no encontrado");
+        model.addAttribute("uri", request.getRequestURI());
+        
+        return "error-personalizado";
     }
-
-    // En PaginaController.java
-    @GetMapping("/probar-error/{tipo}")
-    public String probarError(@PathVariable String tipo) {
+    
+    // ===== ENDPOINT QUE GENERA ERROR INTENCIONAL =====
+    
+    @GetMapping("/generar-error/{tipo}")
+    public String generarError(@PathVariable String tipo, Model model) {
+        // Este método NO lanza excepción, solo muestra la página
+        int codigo;
+        String mensaje;
+        
         switch (tipo.toLowerCase()) {
-            case "404":
-                throw new ResourceNotFoundException("Este es un error 404 de prueba");
-            case "400":
-                throw new IllegalArgumentException("Parámetro inválido de prueba");
-            case "500":
-                throw new RuntimeException("Error interno de prueba");
-            case "db":
-                throw new org.springframework.dao.DataAccessException("Error de BD de prueba") {};
+            case "notfound":
+                codigo = 404;
+                mensaje = "Recurso no encontrado";
+                break;
+            case "badrequest":
+                codigo = 400;
+                mensaje = "Solicitud incorrecta";
+                break;
+            case "server":
+                codigo = 500;
+                mensaje = "Error interno del servidor";
+                break;
             default:
-                return "redirect:/";
+                codigo = 500;
+                mensaje = "Error desconocido";
+        }
+        
+        model.addAttribute("codigoError", codigo);
+        model.addAttribute("tipoError", getTipoErrorPorCodigo(codigo));
+        model.addAttribute("error", mensaje + " (Simulado)");
+        model.addAttribute("detalles", "Error simulado para pruebas - Código: " + codigo);
+        
+        return "error-personalizado";
+    }
+    
+    private String getTipoErrorPorCodigo(int codigo) {
+        switch (codigo) {
+            case 404: return "No Encontrado";
+            case 400: return "Solicitud Incorrecta";
+            case 500: return "Error del Servidor";
+            default: return "Error";
         }
     }
         
