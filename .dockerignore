@@ -1,7 +1,8 @@
 target/
 .git/
-*.iml
 *.log
+*.iml
+*.idea
 .DS_Store
 *.class
 *.jar
