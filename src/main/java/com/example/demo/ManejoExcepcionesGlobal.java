@@ -4,62 +4,64 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import java.util.Date;
 
 @ControllerAdvice
 public class ManejoExcepcionesGlobal {
     
-    // 1. Primero las excepciones MÁS ESPECÍFICAS
+    // Excepción personalizada para 404
     @ExceptionHandler(ResourceNotFoundException.class)
     public String manejarRecursoNoEncontrado(ResourceNotFoundException ex, Model model, WebRequest request) {
-        model.addAttribute("error", "Recurso no encontrado: " + ex.getMessage());
-        model.addAttribute("detalles", ex.toString());
-        model.addAttribute("timestamp", new Date());
-        model.addAttribute("codigoError", 404);
-        model.addAttribute("tipoError", "Recurso no encontrado");
-        return "error-personalizado";
+        return configurarError(ex, model, "Recurso no encontrado: " + ex.getMessage(), 
+                               404, "No encontrado", request);
     }
     
     @ExceptionHandler(IllegalArgumentException.class)
     public String manejarArgumentoInvalido(IllegalArgumentException ex, Model model, WebRequest request) {
-        model.addAttribute("error", "Parámetro inválido: " + ex.getMessage());
-        model.addAttribute("detalles", ex.toString());
-        model.addAttribute("timestamp", new Date());
-        model.addAttribute("codigoError", 400);
-        model.addAttribute("tipoError", "Error de validación");
-        return "error-personalizado";
+        return configurarError(ex, model, "Parámetro inválido: " + ex.getMessage(), 
+                               400, "Bad Request", request);
     }
     
     @ExceptionHandler(org.springframework.dao.DataAccessException.class)
     public String manejarErrorBD(org.springframework.dao.DataAccessException ex, Model model, WebRequest request) {
-        model.addAttribute("error", "Error en la base de datos: " + ex.getMessage());
-        model.addAttribute("detalles", ex.toString());
-        model.addAttribute("timestamp", new Date());
-        model.addAttribute("codigoError", 503);
-        model.addAttribute("tipoError", "Error de base de datos");
-        return "error-personalizado";
+        return configurarError(ex, model, "Error en la base de datos: " + ex.getMessage(), 
+                               503, "Service Unavailable", request);
     }
     
-    // 2. Excepciones de Spring MVC
+    // Capturar excepciones 404 de Spring
     @ExceptionHandler(org.springframework.web.servlet.NoHandlerFoundException.class)
-    public String manejarPaginaNoEncontrada(Exception ex, Model model, WebRequest request) {
-        model.addAttribute("error", "Página no encontrada: " + request.getDescription(false));
-        model.addAttribute("detalles", ex.toString());
-        model.addAttribute("timestamp", new Date());
-        model.addAttribute("codigoError", 404);
-        model.addAttribute("tipoError", "Página no encontrada");
-        return "error-personalizado";
+    public String manejarNoHandlerFound(org.springframework.web.servlet.NoHandlerFoundException ex, 
+                                        Model model, WebRequest request) {
+        return configurarError(ex, model, "Página no encontrada: " + ex.getRequestURL(), 
+                               404, "Página no encontrada", request);
     }
     
-    // 3. ÚLTIMO: La excepción más general (Exception.class)
+    // Capturar TODAS las excepciones
     @ExceptionHandler(Exception.class)
-    public String manejarExcepcionGeneral(Exception ex, Model model, WebRequest request) {
-        model.addAttribute("error", "Ha ocurrido un error inesperado: " + ex.getMessage());
+    public String manejarExcepcionGeneral(Exception ex, Model model, WebRequest request, 
+                                          HttpServletRequest httpRequest) {
+        return configurarError(ex, model, "Error interno: " + ex.getMessage(), 
+                               500, "Error interno del servidor", request);
+    }
+    
+    // Método auxiliar para configurar errores
+    private String configurarError(Exception ex, Model model, String mensaje, 
+                                   int codigo, String tipo, WebRequest request) {
+        
+        model.addAttribute("error", mensaje);
         model.addAttribute("detalles", ex.toString());
         model.addAttribute("timestamp", new Date());
-        model.addAttribute("codigoError", 500);
-        model.addAttribute("tipoError", "Error interno del servidor");
+        model.addAttribute("codigoError", codigo);
+        model.addAttribute("tipoError", tipo);
+        model.addAttribute("uri", request.getDescription(false));
+        
+        // Log para debugging
+        System.err.println("=== ERROR " + codigo + " ===");
+        System.err.println("Tipo: " + ex.getClass().getName());
+        System.err.println("Mensaje: " + ex.getMessage());
+        
         return "error-personalizado";
     }
 }

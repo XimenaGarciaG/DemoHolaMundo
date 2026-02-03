@@ -236,7 +236,24 @@ public class PaginaController {
             super(message);
         }
     }
-    
+
+    // En PaginaController.java
+    @GetMapping("/probar-error/{tipo}")
+    public String probarError(@PathVariable String tipo) {
+        switch (tipo.toLowerCase()) {
+            case "404":
+                throw new ResourceNotFoundException("Este es un error 404 de prueba");
+            case "400":
+                throw new IllegalArgumentException("Parámetro inválido de prueba");
+            case "500":
+                throw new RuntimeException("Error interno de prueba");
+            case "db":
+                throw new org.springframework.dao.DataAccessException("Error de BD de prueba") {};
+            default:
+                return "redirect:/";
+        }
+    }
+        
     // ===== CLASE PERSONA (solo memoria) =====
     public static class Persona {
         private int id;
