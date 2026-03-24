@@ -6,7 +6,7 @@ services:
     region: ohio
     branch: main
     buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -jar target/*.jar --server.port=$PORT
+    startCommand: java -jar target/demo-0.0.1-SNAPSHOT.jar --server.port=$PORT
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
