@@ -46,12 +46,19 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- H2 Database (EN MEMORIA - para desarrollo) -->
+		<!--BASE DE DATOS-->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		
+		<!-- H2 Database (EN MEMORIA - para desarrollo)
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
-		</dependency>
+		</dependency>  -->
 		
 	</dependencies>
 

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Carrusel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --pastel-blue: #a8d8ea;
+            --pastel-green: #b8e0d2;
+            --pastel-pink: #ffd6e7;
+            --pastel-purple: #d9c5f4;
+            --pastel-yellow: #fff9c4;
+            --pastel-lavender: #e6e6fa;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--pastel-lavender), var(--pastel-blue));
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding-top: 76px;
+        }
+
+        .navbar-pastel {
+            background-color: var(--pastel-blue) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link {
+            color: #5a5a5a !important;
+            font-weight: 500;
+            padding: 8px 15px !important;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            background-color: var(--pastel-purple) !important;
+            color: #333 !important;
+        }
+
+        .nav-link.active {
+            background-color: var(--pastel-pink) !important;
+            color: #333 !important;
+        }
+
+        .card-admin {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .card-header-pastel {
+            background: linear-gradient(135deg, var(--pastel-blue), var(--pastel-purple));
+            color: #333;
+            padding: 15px 25px;
+            border-bottom: none;
+        }
+
+        .card-header-pastel h4 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .btn-pastel-primary {
+            background-color: var(--pastel-pink);
+            border: none;
+            color: #333;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-pastel-primary:hover {
+            background-color: var(--pastel-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-pastel-danger {
+            background-color: #ffb6c1;
+            border: none;
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .btn-pastel-danger:hover {
+            background-color: #ff9aa9;
+            transform: scale(1.05);
+        }
+
+        .btn-pastel-secondary {
+            background-color: var(--pastel-blue);
+            border: none;
+            color: #333;
+            padding: 8px 20px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .imagen-preview {
+            width: 100px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid var(--pastel-purple);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--pastel-yellow), var(--pastel-pink));
+            border-radius: 15px;
+            display: none;
+            text-align: center;
+        }
+
+        .preview-container.show {
+            display: block;
+        }
+
+        .preview-img {
+            max-width: 300px;
+            max-height: 200px;
+            border-radius: 15px;
+            border: 4px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-area {
+            border: 3px dashed var(--pastel-purple);
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: var(--pastel-pink);
+            transform: scale(1.02);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--pastel-purple);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            padding: 8px;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, var(--pastel-blue), var(--pastel-purple));
+            color: #333;
+            font-weight: 600;
+            border: none;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(168, 216, 234, 0.1);
+        }
+
+        .badge-orden {
+            background-color: var(--pastel-yellow);
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-activa {
+            background-color: var(--pastel-green);
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        .badge-inactiva {
+            background-color: #ffb6c1;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        .form-control,
+        .form-select {
+            border: 2px solid var(--pastel-blue);
+            border-radius: 12px;
+            padding: 10px 15px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--pastel-purple);
+            box-shadow: 0 0 0 3px rgba(217, 197, 244, 0.3);
+            outline: none;
+        }
+
+        .drag-over {
+            background: rgba(168, 216, 234, 0.3);
+            border-color: var(--pastel-pink);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Barra de Navegación -->
+    <nav class="navbar navbar-expand-lg navbar-pastel fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-house-heart"></i> Sistema Simple
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/principal">Personas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/carrusel">Ver Carrusel</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/carrusel/admin">
+                            <i class="bi bi-gear-fill"></i> Administrar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Mensajes -->
+        <div th:if="${exito != null}" class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${exito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Formulario para agregar imagen MEJORADO -->
+        <div class="card-admin">
+            <div class="card-header-pastel">
+                <h4 class="mb-0">
+                    <i class="bi bi-cloud-upload me-2"></i> Subir Nueva Imagen
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form th:action="@{/carrusel/agregar}" method="post" enctype="multipart/form-data" id="uploadForm">
+
+
+                    <!-- Área de subida de archivos MEJORADA -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-file-image me-2"></i>Seleccionar imagen *
+                        </label>
+                        <div class="upload-area" id="uploadArea">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                            <h5 class="mt-3">Haz clic o arrastra una imagen aquí</h5>
+                            <p class="text-muted mb-0">Formatos permitidos: JPG, PNG, GIF (Máx. 5MB)</p>
+                            <input type="file" name="archivoImagen" id="fileInput" class="file-input"
+                                accept="image/jpeg,image/png,image/gif" required>
+                            <div class="file-name" id="fileName"></div>
+                        </div>
+                    </div>
+
+                    <!-- Vista previa mejorada -->
+                    <div class="preview-container" id="previewContainer">
+                        <h5 class="mb-3"><i class="bi bi-eye-fill me-2"></i>Vista previa</h5>
+                        <img src="" alt="Vista previa" class="preview-img" id="previewImg">
+                        <button type="button" class="btn btn-pastel-secondary mt-3" onclick="cambiarImagen()">
+                            <i class="bi bi-arrow-repeat me-2"></i>Cambiar imagen
+                        </button>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-pastel-primary" id="btnSubir">
+                            <i class="bi bi-cloud-check me-2"></i> Subir Imagen al Carrusel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lista de imágenes actuales MEJORADA -->
+        <div class="card-admin">
+            <div class="card-header-pastel">
+                <h4 class="mb-0">
+                    <i class="bi bi-images me-2"></i> Galería del Carrusel
+                    <span class="badge bg-light text-dark ms-2" th:text="${#lists.size(imagenes)}"></span>
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <div th:if="${imagenes.empty}" class="text-center py-5">
+                    <i class="bi bi-image display-1" style="color: var(--pastel-purple);"></i>
+                    <h4 class="mt-3 text-muted">No hay imágenes en el carrusel</h4>
+                    <p class="text-muted">¡Sube tu primera imagen usando el formulario de arriba!</p>
+                </div>
+
+                <div th:if="${not imagenes.empty}" class="table-container">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Imagen</th>
+                                <th>Orden</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="img : ${imagenes}">
+                                <td><span class="badge-orden" th:text="${img.id}"></span></td>
+                                <td>
+                                    <img th:src="${img.imageUrl}" class="imagen-preview" alt="Imagen del carrusel">
+                                </td>
+                                <td>
+                                    <span class="badge-orden" th:text="${img.orden}">
+                                        <i class="bi bi-sort-numeric-up"></i>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:if="${img.activa}" class="badge-activa">
+                                        <i class="bi bi-check-circle"></i> Activa
+                                    </span>
+                                    <span th:unless="${img.activa}" class="badge-inactiva">
+                                        <i class="bi bi-x-circle"></i> Inactiva
+                                    </span>
+                                </td>
+                                <td>
+                                    <form th:action="@{/carrusel/eliminar/{id}(id=${img.id})}" method="post"
+                                        class="d-inline"
+                                        onsubmit="return confirm('¿Estás segura de eliminar esta imagen?');">
+                                        <button type="submit" class="btn btn-pastel-danger btn-sm">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const fileName = document.getElementById('fileName');
+            const previewContainer = document.getElementById('previewContainer');
+            const previewImg = document.getElementById('previewImg');
+            const btnSubir = document.getElementById('btnSubir');
+
+            // Hacer clic en el área de subida
+            uploadArea.addEventListener('click', function () {
+                fileInput.click();
+            });
+
+            // Arrastrar y soltar
+            uploadArea.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            uploadArea.addEventListener('dragleave', function () {
+                this.classList.remove('drag-over');
+            });
+
+            uploadArea.addEventListener('drop', function (e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    actualizarVistaPrevia(files[0]);
+                }
+            });
+
+            // Cambio de archivo
+            fileInput.addEventListener('change', function () {
+                if (this.files.length > 0) {
+                    actualizarVistaPrevia(this.files[0]);
+                }
+            });
+
+            function actualizarVistaPrevia(file) {
+                // Validar tipo de archivo
+                if (!file.type.startsWith('image/')) {
+                    alert('Por favor, selecciona un archivo de imagen válido.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                // Validar tamaño (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('La imagen no debe superar los 5MB.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                // Mostrar nombre del archivo
+                fileName.textContent = '📁 ' + file.name + ' (' + (file.size / 1024).toFixed(2) + ' KB)';
+
+                // Vista previa
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImg.src = e.target.result;
+                    previewContainer.classList.add('show');
+                }
+                reader.readAsDataURL(file);
+            }
+
+            // Animación del botón al enviar
+            document.getElementById('uploadForm').addEventListener('submit', function () {
+                btnSubir.innerHTML = '<i class="bi bi-cloud-arrow-up-fill fa-spin me-2"></i> Subiendo...';
+                btnSubir.disabled = true;
+            });
+        });
+
+        function cambiarImagen() {
+            document.getElementById('fileInput').click();
+        }
+
+        // Auto-ocultar alertas
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
+
+</html>

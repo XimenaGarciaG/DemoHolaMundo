@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrusel de Imágenes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <!-- SortableJS para drag and drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <style>
+        :root {
+            --pastel-blue: #a8d8ea;
+            --pastel-green: #b8e0d2;
+            --pastel-pink: #ffd6e7;
+            --pastel-purple: #d9c5f4;
+            --pastel-yellow: #fff9c4;
+            --pastel-lavender: #e6e6fa;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--pastel-lavender), var(--pastel-blue));
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding-top: 76px;
+            padding-bottom: 40px;
+        }
+
+        .navbar-pastel {
+            background-color: var(--pastel-blue) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link {
+            color: #5a5a5a !important;
+            font-weight: 500;
+            padding: 8px 15px !important;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            background-color: var(--pastel-purple) !important;
+            color: #333 !important;
+        }
+
+        .nav-link.active {
+            background-color: var(--pastel-pink) !important;
+            color: #333 !important;
+        }
+
+        /* Estilos para la galería */
+        .gallery-title {
+            color: #333;
+            font-weight: 300;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--pastel-purple), var(--pastel-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gallery-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .sortable-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+            min-height: 200px;
+        }
+
+        .image-card {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            cursor: grab;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+            position: relative;
+        }
+
+        .image-card:active {
+            cursor: grabbing;
+            opacity: 0.8;
+        }
+
+        .image-card.drag-sort-active {
+            border-color: var(--pastel-purple);
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-bottom: 2px solid var(--pastel-blue);
+        }
+
+        .image-info {
+            padding: 15px;
+        }
+
+        .image-info h5 {
+            margin: 0 0 5px 0;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .image-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .image-order {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--pastel-purple);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .drag-handle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--pastel-purple);
+            cursor: grab;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .save-order-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-pastel-save {
+            background: linear-gradient(135deg, var(--pastel-green), var(--pastel-blue));
+            border: none;
+            color: #333;
+            padding: 12px 40px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-pastel-save:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, var(--pastel-blue), var(--pastel-green));
+        }
+
+        .btn-pastel-save:disabled {
+            opacity: 0.5;
+            transform: none;
+        }
+
+        .empty-gallery {
+            text-align: center;
+            padding: 60px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 30px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .empty-gallery i {
+            font-size: 5rem;
+            color: var(--pastel-purple);
+        }
+
+        .order-changed-badge {
+            background: var(--pastel-yellow);
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .image-card {
+                width: 100%;
+                max-width: 350px;
+            }
+
+            .gallery-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Barra de Navegación -->
+    <nav class="navbar navbar-expand-lg navbar-pastel fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-house-heart"></i> Sistema Simple
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/principal">Personas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/carrusel">Carrusel</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/carrusel/admin">
+                            <i class="bi bi-gear-fill"></i> Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container gallery-container">
+        <!-- Título -->
+        <h1 class="gallery-title">
+            <i class="bi bi-images me-3"></i>Galería Interactiva
+        </h1>
+
+        <!-- Mensajes -->
+        <div th:if="${exito != null}" class="alert alert-success alert-dismissible fade show text-center">
+            <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${exito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show text-center">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Contenido principal -->
+        <div th:if="${not #lists.isEmpty(imagenes)}">
+            <!-- Barra de estado -->
+            <div class="save-order-container">
+                <span class="me-3">
+                    <i class="bi bi-arrows-move"></i>
+                    Arrastra las imágenes para reordenarlas
+                </span>
+                <span class="order-changed-badge" id="orderChangedBadge" style="display: none;">
+                    <i class="bi bi-exclamation-circle"></i> Sin guardar
+                </span>
+            </div>
+
+            <!-- Grid de imágenes sortable -->
+            <div id="sortableGrid" class="sortable-grid">
+                <!-- En el grid de imágenes, actualiza la ruta -->
+                <div th:each="img, stat : ${imagenes}" class="image-card" th:attr="data-id=${img.id}">
+                    <span class="image-order" th:text="${stat.index + 1}"></span>
+                    <div class="drag-handle">
+                        <i class="bi bi-grip-vertical"></i>
+                    </div>
+                    <img th:src="${img.imageUrl}" alt="Imagen del carrusel"
+                        style="width:100%; height:160px; object-fit:cover;">
+                </div>
+            </div>
+
+            <!-- Botón para guardar orden -->
+            <div class="text-center mt-4">
+                <button id="saveOrderBtn" class="btn btn-pastel-save" onclick="guardarOrden()" disabled>
+                    <i class="bi bi-save me-2"></i> Guardar Nuevo Orden
+                </button>
+                <p class="text-muted mt-2 small">
+                    <i class="bi bi-info-circle"></i>
+                    Los cambios se aplicarán inmediatamente al carrusel principal
+                </p>
+            </div>
+        </div>
+
+        <!-- Mensaje cuando no hay imágenes -->
+        <div th:if="${#lists.isEmpty(imagenes)}" class="empty-gallery">
+            <i class="bi bi-image"></i>
+            <h3 class="mt-4">No hay imágenes en el carrusel</h3>
+            <p class="text-muted mb-4">¡Comienza agregando tu primera imagen!</p>
+            <a href="/carrusel/admin" class="btn btn-pastel-save">
+                <i class="bi bi-plus-circle me-2"></i> Agregar Imágenes
+            </a>
+        </div>
+
+        <!-- Botón para ir a admin (siempre visible) -->
+        <div class="text-center mt-5">
+            <a href="/carrusel/admin" class="btn btn-outline-secondary">
+                <i class="bi bi-gear me-2"></i> Administrar Carrusel
+            </a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let sortable;
+        let ordenOriginal = [];
+        let ordenActual = [];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Inicializar SortableJS
+            const grid = document.getElementById('sortableGrid');
+            if (grid) {
+                // Guardar orden original
+                document.querySelectorAll('.image-card').forEach(card => {
+                    ordenOriginal.push(card.dataset.id);
+                });
+                ordenActual = [...ordenOriginal];
+
+                sortable = new Sortable(grid, {
+                    animation: 150,
+                    handle: '.drag-handle',
+                    ghostClass: 'drag-sort-active',
+                    onEnd: function () {
+                        // Actualizar números de orden
+                        actualizarNumerosOrden();
+
+                        // Detectar si el orden cambió
+                        const nuevoOrden = [];
+                        document.querySelectorAll('.image-card').forEach(card => {
+                            nuevoOrden.push(card.dataset.id);
+                        });
+
+                        const ordenCambio = !arraysIguales(ordenOriginal, nuevoOrden);
+                        document.getElementById('saveOrderBtn').disabled = !ordenCambio;
+                        document.getElementById('orderChangedBadge').style.display = ordenCambio ? 'inline-block' : 'none';
+
+                        if (ordenCambio) {
+                            ordenActual = nuevoOrden;
+                        }
+                    }
+                });
+            }
+
+            // Auto-ocultar alertas
+            setTimeout(() => {
+                document.querySelectorAll('.alert').forEach(alert => {
+                    alert.style.transition = 'opacity 0.5s';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                });
+            }, 5000);
+        });
+
+        function actualizarNumerosOrden() {
+            const cards = document.querySelectorAll('.image-card');
+            cards.forEach((card, index) => {
+                const orderSpan = card.querySelector('.image-order');
+                orderSpan.textContent = index + 1;
+            });
+        }
+
+        function arraysIguales(arr1, arr2) {
+            if (arr1.length !== arr2.length) return false;
+            for (let i = 0; i < arr1.length; i++) {
+                if (arr1[i] !== arr2[i]) return false;
+            }
+            return true;
+        }
+
+        function guardarOrden() {
+            const btn = document.getElementById('saveOrderBtn');
+            const nuevoOrden = [];
+
+            document.querySelectorAll('.image-card').forEach(card => {
+                nuevoOrden.push(card.dataset.id);
+            });
+
+            // Deshabilitar botón y mostrar carga
+            btn.innerHTML = '<i class="bi bi-arrow-repeat fa-spin me-2"></i> Guardando...';
+            btn.disabled = true;
+
+            // Enviar nuevo orden al servidor
+            fetch('/carrusel/reordenar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ orden: nuevoOrden })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Actualizar orden original
+                        ordenOriginal = [...nuevoOrden];
+                        ordenActual = [...nuevoOrden];
+
+                        // Ocultar badge y mostrar éxito
+                        document.getElementById('orderChangedBadge').style.display = 'none';
+
+                        // Mostrar mensaje de éxito
+                        const alerta = document.createElement('div');
+                        alerta.className = 'alert alert-success alert-dismissible fade show text-center position-fixed top-0 start-50 translate-middle-x mt-5';
+                        alerta.style.zIndex = '9999';
+                        alerta.innerHTML = `
+                        <i class="bi bi-check-circle-fill me-2"></i> 
+                        Orden guardado exitosamente
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                        document.body.appendChild(alerta);
+
+                        setTimeout(() => {
+                            alerta.style.transition = 'opacity 0.5s';
+                            alerta.style.opacity = '0';
+                            setTimeout(() => alerta.remove(), 500);
+                        }, 3000);
+                    } else {
+                        throw new Error(data.error || 'Error al guardar');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al guardar el orden: ' + error.message);
+                })
+                .finally(() => {
+                    btn.innerHTML = '<i class="bi bi-save me-2"></i> Guardar Nuevo Orden';
+                    btn.disabled = false;
+                });
+        }
+    </script>
+</body>
+
+</html>
