@@ -18,8 +18,11 @@ public class PersonaEntity {
     @Column(nullable = false, unique = true)
     private String email;
     
-    @Column(name = "fecha_nacimiento", nullable = false)
+    @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
+    
+    @Column(nullable = false)
+    private Integer edad; // Campo legacy requerido por la BD (NOT NULL)
     
     @Column(length = 10)
     private String telefono;
@@ -80,4 +83,18 @@ public class PersonaEntity {
     
     public Boolean getAceptaTerminos() { return aceptaTerminos; }
     public void setAceptaTerminos(Boolean aceptaTerminos) { this.aceptaTerminos = aceptaTerminos; }
+
+    // Sincronización automática de edad (para compatibilidad con BD legacy)
+    @PrePersist
+    @PreUpdate
+    public void calcularEdadLegacy() {
+        if (fechaNacimiento != null) {
+            this.edad = (int) java.time.temporal.ChronoUnit.YEARS.between(fechaNacimiento, LocalDate.now());
+        } else if (this.edad == null) {
+            this.edad = 0;
+        }
+    }
+
+    public Integer getEdad() { return edad; }
+    public void setEdad(Integer edad) { this.edad = edad; }
 }

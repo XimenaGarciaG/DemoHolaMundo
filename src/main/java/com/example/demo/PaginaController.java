@@ -242,7 +242,7 @@ public class PaginaController {
                         p.getId(), 
                         p.getNombre(), 
                         p.getEmail(), 
-                        ChronoUnit.YEARS.between(p.getFechaNacimiento(), LocalDate.now()),
+                        p.getFechaNacimiento() != null ? ChronoUnit.YEARS.between(p.getFechaNacimiento(), LocalDate.now()) : 0,
                         p.getFechaRegistro().toString()));
                 }
             }
