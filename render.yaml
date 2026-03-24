@@ -3,7 +3,7 @@ services:
     name: demo-springboot
     env: maven
     plan: free
-    region: oregon
+    region: ohio
     branch: main
     buildCommand: ./mvnw clean package -DskipTests
     startCommand: java -jar target/demo-0.0.1-SNAPSHOT.jar --server.port=$PORT
