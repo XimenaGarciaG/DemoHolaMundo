@@ -16,8 +16,10 @@ public interface PersonaRepository extends JpaRepository<PersonaEntity, Long> {
     // Buscar por nombre
     List<PersonaEntity> findByNombreContainingIgnoreCase(String nombre);
     
-    // Buscar por edad
-    List<PersonaEntity> findByEdad(Integer edad);
+    import java.time.LocalDate;
+    
+    // Buscar por fecha de nacimiento
+    List<PersonaEntity> findByFechaNacimiento(LocalDate fechaNacimiento);
     
     // Ordenar por fecha
     List<PersonaEntity> findAll();

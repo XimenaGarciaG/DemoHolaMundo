@@ -268,7 +268,7 @@
                                     <th>ID</th>
                                     <th>Nombre</th>
                                     <th>Email</th>
-                                    <th>Edad</th>
+                                    <th>Fecha Nacimiento</th>
                                     <th>Teléfono</th>
                                     <th>Estado Civil</th>
                                     <th>Fecha Registro</th>
@@ -281,7 +281,7 @@
                                     <td th:text="${persona.nombre}"></td>
                                     <td th:text="${persona.email}"></td>
                                     <td>
-                                        <span class="badge bg-info" th:text="${persona.edad}"></span>
+                                        <span class="badge bg-info" th:text="${persona.fechaNacimiento}"></span>
                                     </td>
                                     <td th:text="${persona.telefono} ?: 'No especificado'"></td>
                                     <td th:text="${persona.estadoCivil} ?: '-'"></td>

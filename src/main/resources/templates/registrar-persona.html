@@ -242,12 +242,11 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">
-                                        <i class="fas fa-birthday-cake"></i> Edad *
+                                        <i class="fas fa-birthday-cake"></i> Fecha de Nacimiento *
                                     </label>
-                                    <input type="number" name="edad" class="form-control" placeholder="25" min="18"
-                                        max="100" required>
-                                    <div class="form-text">18-100 años</div>
-                                    <div class="error-message" id="edadError"></div>
+                                    <input type="date" name="fechaNacimiento" class="form-control" required>
+                                    <div class="form-text">Debes ser mayor de 18 años</div>
+                                    <div class="error-message" id="fechaNacimientoError"></div>
                                 </div>
 
                                 <!-- Teléfono -->
@@ -256,8 +255,8 @@
                                         <i class="fas fa-phone"></i> Teléfono
                                     </label>
                                     <input type="text" name="telefono" class="form-control"
-                                        placeholder="10 dígitos (opcional)" pattern="\d{10}">
-                                    <div class="form-text">Formato: 10 dígitos</div>
+                                        placeholder="10 dígitos (opcional)" pattern="\d{10}" maxlength="10">
+                                    <div class="form-text">Formato: Exactamente 10 dígitos</div>
                                     <div class="error-message" id="telefonoError"></div>
                                 </div>
 
@@ -347,7 +346,7 @@
             // Validación en tiempo real
             const nombreInput = document.querySelector('input[name="nombre"]');
             const emailInput = document.querySelector('input[name="email"]');
-            const edadInput = document.querySelector('input[name="edad"]');
+            const fechaNacimientoInput = document.querySelector('input[name="fechaNacimiento"]');
             const telefonoInput = document.querySelector('input[name="telefono"]');
 
             // Validar nombre
@@ -375,12 +374,19 @@
                 }
             });
 
-            // Validar edad
-            edadInput.addEventListener('blur', function () {
-                const errorElement = document.getElementById('edadError');
-                const edad = parseInt(this.value);
-                if (isNaN(edad) || edad < 18 || edad > 100) {
-                    errorElement.textContent = 'La edad debe estar entre 18 y 100 años';
+            // Validar fecha de nacimiento
+            fechaNacimientoInput.addEventListener('blur', function () {
+                const errorElement = document.getElementById('fechaNacimientoError');
+                const fechaNac = new Date(this.value);
+                const hoy = new Date();
+                let edad = hoy.getFullYear() - fechaNac.getFullYear();
+                const m = hoy.getMonth() - fechaNac.getMonth();
+                if (m < 0 || (m === 0 && hoy.getDate() < fechaNac.getDate())) {
+                    edad--;
+                }
+
+                if (!this.value || edad < 18) {
+                    errorElement.textContent = 'Debes ser mayor de 18 años';
                     this.classList.add('is-invalid');
                 } else {
                     errorElement.textContent = '';
@@ -470,11 +476,18 @@
                     isValid = false;
                 }
 
-                // Validar edad
-                const edad = parseInt(edadInput.value);
-                if (isNaN(edad) || edad < 18 || edad > 100) {
-                    document.getElementById('edadError').textContent = 'Edad inválida (18-100)';
-                    edadInput.classList.add('is-invalid');
+                // Validar fecha de nacimiento
+                const fechaNac = new Date(fechaNacimientoInput.value);
+                const hoy = new Date();
+                let edad = hoy.getFullYear() - fechaNac.getFullYear();
+                const m = hoy.getMonth() - fechaNac.getMonth();
+                if (m < 0 || (m === 0 && hoy.getDate() < fechaNac.getDate())) {
+                    edad--;
+                }
+
+                if (!fechaNacimientoInput.value || edad < 18) {
+                    document.getElementById('fechaNacimientoError').textContent = 'Debes ser mayor de 18 años';
+                    fechaNacimientoInput.classList.add('is-invalid');
                     isValid = false;
                 }
 

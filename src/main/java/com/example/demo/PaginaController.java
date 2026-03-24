@@ -14,7 +14,9 @@ import org.springframework.data.domain.Sort;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -240,7 +242,7 @@ public class PaginaController {
                         p.getId(), 
                         p.getNombre(), 
                         p.getEmail(), 
-                        p.getEdad(),
+                        ChronoUnit.YEARS.between(p.getFechaNacimiento(), LocalDate.now()),
                         p.getFechaRegistro().toString()));
                 }
             }
@@ -270,7 +272,7 @@ public class PaginaController {
     public String procesarRegistro(
             @RequestParam String nombre,
             @RequestParam String email,
-            @RequestParam int edad,
+            @RequestParam LocalDate fechaNacimiento,
             @RequestParam(required = false) String telefono,
             @RequestParam String estadoCivil,  // NUEVO
             @RequestParam(required = false) String recaptchaResponse,
@@ -289,7 +291,7 @@ public class PaginaController {
                 return "redirect:/registrar";
             }
             
-            if (edad < 18) {
+            if (ChronoUnit.YEARS.between(fechaNacimiento, LocalDate.now()) < 18) {
                 redirectAttributes.addFlashAttribute("error", "Debes ser mayor de 18 años");
                 return "redirect:/registrar";
             }
@@ -310,7 +312,7 @@ public class PaginaController {
             PersonaEntity persona = new PersonaEntity();
             persona.setNombre(nombre.trim());
             persona.setEmail(email.trim());
-            persona.setEdad(edad);
+            persona.setFechaNacimiento(fechaNacimiento);
             persona.setTelefono(telefono != null ? telefono.trim() : "");
             persona.setEstadoCivil(estadoCivil);  // NUEVO
             persona.setPassword("default123"); // Contraseña por defecto (deberías encriptarla)
@@ -324,7 +326,7 @@ public class PaginaController {
             personaMemoria.setId(contadorId++);
             personaMemoria.setNombre(nombre);
             personaMemoria.setEmail(email);
-            personaMemoria.setEdad(edad);
+            personaMemoria.setFechaNacimiento(fechaNacimiento);
             personaMemoria.setTelefono(telefono);
             personasRegistradas.add(personaMemoria);
             
@@ -443,7 +445,7 @@ public class PaginaController {
             @PathVariable Long id,
             @RequestParam String nombre,
             @RequestParam String email,
-            @RequestParam int edad,
+            @RequestParam LocalDate fechaNacimiento,
             @RequestParam(required = false) String telefono,
             @RequestParam String estadoCivil,
             RedirectAttributes redirectAttributes) {
@@ -455,7 +457,7 @@ public class PaginaController {
                 return "redirect:/editar/" + id;
             }
             
-            if (edad < 18) {
+            if (ChronoUnit.YEARS.between(fechaNacimiento, LocalDate.now()) < 18) {
                 redirectAttributes.addFlashAttribute("error", "Debes ser mayor de 18 años");
                 return "redirect:/editar/" + id;
             }
@@ -475,7 +477,7 @@ public class PaginaController {
             // Actualizar datos
             persona.setNombre(nombre.trim());
             persona.setEmail(email.trim());
-            persona.setEdad(edad);
+            persona.setFechaNacimiento(fechaNacimiento);
             persona.setTelefono(telefono != null ? telefono.trim() : "");
             persona.setEstadoCivil(estadoCivil);
             
@@ -517,7 +519,7 @@ public class PaginaController {
         private int id;
         private String nombre;
         private String email;
-        private int edad;
+        private LocalDate fechaNacimiento;
         private String telefono;
         
         public int getId() { return id; }
@@ -529,8 +531,8 @@ public class PaginaController {
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
         
-        public int getEdad() { return edad; }
-        public void setEdad(int edad) { this.edad = edad; }
+        public LocalDate getFechaNacimiento() { return fechaNacimiento; }
+        public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
         
         public String getTelefono() { return telefono; }
         public void setTelefono(String telefono) { this.telefono = telefono; }

@@ -2,6 +2,8 @@ package com.example.demo;
 
 import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDate;
 
 public class PersonaForm {
     
@@ -13,10 +15,10 @@ public class PersonaForm {
     @Email(message = "Debe ser un email válido")
     private String email;
     
-    @NotNull(message = "La edad es obligatoria")
-    @Min(value = 1, message = "La edad mínima es 1 año")
-    @Max(value = 120, message = "La edad máxima es 120 años")
-    private Integer edad;
+    @NotNull(message = "La fecha de nacimiento es obligatoria")
+    @Past(message = "La fecha de nacimiento debe ser en el pasado")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate fechaNacimiento;
     
     @Pattern(regexp = "^\\d{10}$", message = "El teléfono debe tener 10 dígitos")
     private String telefono;
@@ -48,8 +50,8 @@ public class PersonaForm {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     
-    public Integer getEdad() { return edad; }
-    public void setEdad(Integer edad) { this.edad = edad; }
+    public LocalDate getFechaNacimiento() { return fechaNacimiento; }
+    public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
     
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }

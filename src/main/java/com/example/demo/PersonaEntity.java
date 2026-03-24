@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,8 +18,8 @@ public class PersonaEntity {
     @Column(nullable = false, unique = true)
     private String email;
     
-    @Column(nullable = false)
-    private Integer edad;
+    @Column(name = "fecha_nacimiento", nullable = false)
+    private LocalDate fechaNacimiento;
     
     @Column(length = 10)
     private String telefono;
@@ -56,8 +57,8 @@ public class PersonaEntity {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     
-    public Integer getEdad() { return edad; }
-    public void setEdad(Integer edad) { this.edad = edad; }
+    public LocalDate getFechaNacimiento() { return fechaNacimiento; }
+    public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
     
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
