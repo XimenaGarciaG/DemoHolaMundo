@@ -11,13 +11,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
+import org.springframework.data.jpa.domain.Specification;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -160,10 +162,42 @@ public class PaginaController {
     public String mostrarPrincipal(
             @RequestParam(required = false, defaultValue = "0") int pagina,
             @RequestParam(required = false, defaultValue = "5") int tamano,
+            @RequestParam(required = false) String inicial,
+            @RequestParam(required = false) Integer mes,
+            @RequestParam(required = false) Integer anio,
+            @RequestParam(required = false) String estadoCivil,
+            @RequestParam(required = false) String dominio,
             Model model) {
         
         try {
-            System.out.println("=== CARGANDO PÁGINA PRINCIPAL ===");
+            System.out.println("=== CARGANDO PÁGINA PRINCIPAL CON FILTROS ===");
+            
+            // Construir Specification dinámica
+            Specification<PersonaEntity> spec = (root, query, cb) -> {
+                List<Predicate> predicates = new ArrayList<>();
+                
+                if (inicial != null && !inicial.isEmpty()) {
+                    predicates.add(cb.like(cb.upper(root.get("nombre")), inicial.toUpperCase() + "%"));
+                }
+                
+                if (mes != null) {
+                    predicates.add(cb.equal(cb.function("EXTRACT", Integer.class, cb.literal("MONTH"), root.get("fechaNacimiento")), mes));
+                }
+                
+                if (anio != null) {
+                    predicates.add(cb.equal(cb.function("EXTRACT", Integer.class, cb.literal("YEAR"), root.get("fechaNacimiento")), anio));
+                }
+                
+                if (estadoCivil != null && !estadoCivil.isEmpty()) {
+                    predicates.add(cb.equal(root.get("estadoCivil"), estadoCivil));
+                }
+                
+                if (dominio != null && !dominio.isEmpty()) {
+                    predicates.add(cb.like(root.get("email"), "%@" + dominio));
+                }
+                
+                return cb.and(predicates.toArray(new Predicate[0]));
+            };
             
             // Validar parámetros
             if (pagina < 0) pagina = 0;
@@ -180,7 +214,7 @@ public class PaginaController {
             
             // Crear pageable
             Pageable pageable = PageRequest.of(pagina, tamano, Sort.by("fechaRegistro").descending());
-            Page<PersonaEntity> pagePersonas = personaRepository.findAll(pageable);
+            Page<PersonaEntity> pagePersonas = personaRepository.findAll(spec, pageable);
             
             System.out.println("PÁGINA ACTUAL - Registros: " + pagePersonas.getNumberOfElements());
             System.out.println("TOTAL PÁGINAS: " + pagePersonas.getTotalPages());
@@ -203,6 +237,24 @@ public class PaginaController {
             
             int[] tamanosOpciones = {5, 10, 20, 50};
             model.addAttribute("tamanosOpciones", tamanosOpciones);
+            
+            // Agregar opciones de filtros dinámicos
+            model.addAttribute("opcionesIniciales", personaRepository.findUniqueInitials());
+            model.addAttribute("opcionesAnios", personaRepository.findUniqueYears());
+            model.addAttribute("opcionesMeses", personaRepository.findUniqueMonths());
+            model.addAttribute("opcionesEstadosCiviles", personaRepository.findUniqueMaritalStatuses());
+            model.addAttribute("opcionesDominios", personaRepository.findUniqueDomains());
+            
+            // Preservar valores seleccionados
+            model.addAttribute("inicialSel", inicial);
+            model.addAttribute("mesSel", mes);
+            model.addAttribute("anioSel", anio);
+            model.addAttribute("estadoCivilSel", estadoCivil);
+            model.addAttribute("dominioSel", dominio);
+            
+            List<String> mesesNombres = Arrays.asList("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
+                                                    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+            model.addAttribute("mesesNombres", mesesNombres);
             
             // DEBUG - Imprimir qué hay en el modelo
             System.out.println("model.getAttribute('personasBD'): " + model.getAttribute("personasBD"));

@@ -242,6 +242,71 @@
                     </h4>
                 </div>
                 <div class="card-body">
+                    <!-- BARRA DE FILTROS -->
+                    <div class="card bg-light mb-4 border-0">
+                        <div class="card-body">
+                            <form th:action="@{/principal}" method="get" class="row g-3 align-items-end" id="filterForm">
+                                <input type="hidden" name="tamano" th:value="${tamanoPagina}">
+                                
+                                <!-- Inicial -->
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-bold">Inicial</label>
+                                    <select name="inicial" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="">Todas</option>
+                                        <option th:each="opt : ${opcionesIniciales}" th:value="${opt}" 
+                                                th:text="${opt}" th:selected="${opt == inicialSel}"></option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Año -->
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-bold">Año Nac.</label>
+                                    <select name="anio" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="">Todos</option>
+                                        <option th:each="opt : ${opcionesAnios}" th:value="${opt}" 
+                                                th:text="${opt}" th:selected="${opt == anioSel}"></option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Mes -->
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-bold">Mes Nac.</label>
+                                    <select name="mes" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="">Todos</option>
+                                        <option th:each="mIdx : ${opcionesMeses}" th:value="${mIdx}" 
+                                                th:text="${mesesNombres[mIdx - 1]}" th:selected="${mIdx == mesSel}"></option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Estado Civil -->
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-bold">Estado Civil</label>
+                                    <select name="estadoCivil" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="">Todos</option>
+                                        <option th:each="opt : ${opcionesEstadosCiviles}" th:value="${opt}" 
+                                                th:text="${opt}" th:selected="${opt == estadoCivilSel}"></option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Dominio -->
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-bold">Dominio Email</label>
+                                    <select name="dominio" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="">Todos</option>
+                                        <option th:each="opt : ${opcionesDominios}" th:value="${opt}" 
+                                                th:text="${opt}" th:selected="${opt == dominioSel}"></option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-1">
+                                    <a th:href="@{/principal(tamano=${tamanoPagina})}" class="btn btn-sm btn-outline-secondary w-100" title="Limpiar filtros">
+                                        <i class="bi bi-x-circle"></i>
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <!-- Selector de tamaño de página -->
                     <div class="d-flex justify-content-end mb-3">
                         <div class="page-size-selector">
@@ -265,7 +330,6 @@
                         <table class="table table-hover">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>ID</th>
                                     <th>Nombre</th>
                                     <th>Email</th>
                                     <th>Fecha Nacimiento</th>
@@ -277,7 +341,6 @@
                             </thead>
                             <tbody>
                                 <tr th:each="persona : ${personasBD}">
-                                    <td th:text="${persona.id}"></td>
                                     <td th:text="${persona.nombre}"></td>
                                     <td th:text="${persona.email}"></td>
                                     <td>
@@ -330,14 +393,15 @@
                     <!-- Controles de paginación -->
                     <div th:if="${totalPaginas > 0}" class="pagination-container">
                         <!-- Botón Primera Página -->
-                        <a th:if="${paginaActual > 0}" th:href="@{/principal(pagina=0, tamano=${tamanoPagina})}"
+                        <a th:if="${paginaActual > 0}" 
+                           th:href="@{/principal(pagina=0, tamano=${tamanoPagina}, inicial=${inicialSel}, anio=${anioSel}, mes=${mesSel}, estadoCivil=${estadoCivilSel}, dominio=${dominioSel})}"
                             class="btn btn-pastel-outline btn-sm">
                             <i class="bi bi-chevron-double-left"></i> Primera
                         </a>
 
                         <!-- Botón Anterior -->
                         <a th:if="${tieneAnterior}"
-                            th:href="@{/principal(pagina=${paginaAnterior}, tamano=${tamanoPagina})}"
+                            th:href="@{/principal(pagina=${paginaAnterior}, tamano=${tamanoPagina}, inicial=${inicialSel}, anio=${anioSel}, mes=${mesSel}, estadoCivil=${estadoCivilSel}, dominio=${dominioSel})}"
                             class="btn btn-pastel-outline btn-sm">
                             <i class="bi bi-chevron-left"></i> Anterior
                         </a>
@@ -349,14 +413,14 @@
 
                         <!-- Botón Siguiente -->
                         <a th:if="${tieneSiguiente}"
-                            th:href="@{/principal(pagina=${paginaSiguiente}, tamano=${tamanoPagina})}"
+                            th:href="@{/principal(pagina=${paginaSiguiente}, tamano=${tamanoPagina}, inicial=${inicialSel}, anio=${anioSel}, mes=${mesSel}, estadoCivil=${estadoCivilSel}, dominio=${dominioSel})}"
                             class="btn btn-pastel-outline btn-sm">
                             Siguiente <i class="bi bi-chevron-right"></i>
                         </a>
 
                         <!-- Botón Última Página -->
                         <a th:if="${paginaActual < totalPaginas - 1}"
-                            th:href="@{/principal(pagina=${totalPaginas - 1}, tamano=${tamanoPagina})}"
+                            th:href="@{/principal(pagina=${totalPaginas - 1}, tamano=${tamanoPagina}, inicial=${inicialSel}, anio=${anioSel}, mes=${mesSel}, estadoCivil=${estadoCivilSel}, dominio=${dominioSel})}"
                             class="btn btn-pastel-outline btn-sm">
                             Última <i class="bi bi-chevron-double-right"></i>
                         </a>
@@ -381,7 +445,10 @@
 
         // Función para cambiar el tamaño de página
         function cambiarTamanoPagina(tamano) {
-            window.location.href = '/principal?pagina=0&tamano=' + tamano;
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('pagina', '0');
+            urlParams.set('tamano', tamano);
+            window.location.search = urlParams.toString();
         }
 
         // Navegación con teclado
